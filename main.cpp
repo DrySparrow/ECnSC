@@ -90,20 +90,15 @@ uint64_t measure_min_ticks(vector<int>& arr, const size_t RUNS) {
 }
 
 int main() {
-    // Начальный и конечный размеры массива
-    const size_t MIN_SIZE = 256;                     // 256 элементов
-    const size_t MAX_SIZE = 1024 * 1024 * 32 / sizeof(int);  // 32 МБ в элементах int
+    const size_t MIN_SIZE = 256;
+    const size_t MAX_SIZE = 1024 * 1024 * 32 / sizeof(int);
     
-    // Файл для записи результатов
     ofstream outfile("access_patterns.csv");
     outfile << "ArraySize(Bytes),ArraySize(Elements),Forward(ns),Backward(ns),Random(ns)\n";
     
-    // Перебор размеров массива (увеличиваем в 2 раза)
-    for (size_t size_elements = MIN_SIZE; size_elements < MAX_SIZE; size_elements *= 1.02) {
-        // Создаем массив текущего размера
+    for (size_t size_elements = MIN_SIZE; size_elements < MAX_SIZE; size_elements *= 1.05) {
         vector<int> array(size_elements);
         
-        // Заполняем массив случайными значениями
         random_device rd;
         mt19937 gen(rd());
         uniform_int_distribution<int> dis(1, 1000);
@@ -112,13 +107,11 @@ int main() {
             array[i] = dis(gen);
         }
         
-        // Измеряем время для разных паттернов доступа
         double time_forward = 0;
         double time_backward = 0;
         double time_random = 0;
         
-        // Усредняем по нескольким запускам
-        const int RUNS = 10;
+        const int RUNS = 15;
 
         fill_forward(array);
         warm_up(array);
