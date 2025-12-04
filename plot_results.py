@@ -21,7 +21,7 @@ plt.plot(data['ArraySize(Bytes)'], data['Backward(ns)'], 'g-s',
 plt.plot(data['ArraySize(Bytes)'], data['Random(ns)'], 'r-^', 
          linewidth=1, markersize=2, label='random', alpha=0.8)
 
-plt.axvline(x=L1_SIZE, color='red', linestyle='--', alpha=0.7, linewidth=1.5, label='L1 кэш (196 КБ)')
+plt.axvline(x=L1_SIZE, color='red', linestyle='--', alpha=0.7, linewidth=1.5, label='L1 кэш (192 КБ)')
 plt.axvline(x=L2_SIZE, color='orange', linestyle='--', alpha=0.7, linewidth=1.5, label='L2 кэш (2 МБ)')
 plt.axvline(x=L3_SIZE, color='purple', linestyle='--', alpha=0.7, linewidth=1.5, label='L3 кэш (6 МБ)')
 

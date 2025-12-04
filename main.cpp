@@ -10,11 +10,6 @@
 
 using namespace std;
 
-const size_t L1_SIZE = 48 * 1024;      // 48 KB
-const size_t L2_SIZE = 512 * 1024;     // 512 KB  
-const size_t L3_SIZE = 6 * 1024 * 1024; // 6 MB
-const size_t CLEAR_SIZE = 32 * 1024 * 1024; // 32 MB для гарантии
-
 uint64_t getCpuTicks() {
     unsigned int lo, hi;
     __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
@@ -107,21 +102,17 @@ int main() {
             array[i] = dis(gen);
         }
         
-        double time_forward = 0;
-        double time_backward = 0;
-        double time_random = 0;
-        
         const int RUNS = 15;
 
         fill_forward(array);
         warm_up(array);
-        time_forward = measure_min_ticks(array, RUNS);
+        double time_forward = measure_min_ticks(array, RUNS);
         fill_backward(array);
         warm_up(array);
-        time_backward = measure_min_ticks(array, RUNS);
+        double time_backward = measure_min_ticks(array, RUNS);
         fill_random(array);
         warm_up(array);
-        time_random = measure_min_ticks(array, RUNS);
+        double time_random = measure_min_ticks(array, RUNS);
         
         // Размер массива в байтах
         size_t size_bytes = size_elements * sizeof(int);
