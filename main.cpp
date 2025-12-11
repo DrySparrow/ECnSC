@@ -1,6 +1,6 @@
 #include <iostream>
-#include <random>
 #include <fstream>
+#include <cstdint>
 
 using namespace std;
 
@@ -12,10 +12,10 @@ uint64_t getCpuTicks() {
 
 uint64_t measure(const int* arr, size_t size) {
     volatile size_t k = 0;
+    volatile size_t i = 0;
     
-    size_t i;
     const uint64_t start = getCpuTicks();
-    for (i = 0; i < size; ++i) {
+    for (; i < size; ++i) {
         k = arr[k];
     }
     const uint64_t end = getCpuTicks();
@@ -49,10 +49,10 @@ int* getArray(const size_t n, const size_t size, const size_t offset) {
 
 
 int main() {
-    constexpr size_t SIZE = 128 * 1024 / sizeof(int);            // 128KB
-    constexpr size_t OFFSET = 16 * 1024 * 1024 / sizeof(int);   // 16MB
-    constexpr size_t N = 128;
-    constexpr size_t RUNS = 40;
+    constexpr size_t SIZE = 6 * 1024 * 1024 / sizeof(int);            // 48KB L1, 512KB L2, 6MB L3.
+    constexpr size_t OFFSET = 12 * 1024 * 1024 / sizeof(int);   // 96KB L1, 1024KB L2, 12MB L3.
+    constexpr size_t N = 16;            // no more than 32
+    constexpr size_t RUNS = 100;        // better 1000, depends of time compiling)
 
     uint64_t ticks;
 
@@ -60,14 +60,14 @@ int main() {
     outfile << "Size(el),Time(ticks)\n";
     for (int n_times = 1; n_times < N + 1; ++ n_times) {
         const int* arr = getArray(n_times, SIZE, OFFSET);
-        ticks = measure_min_ticks(arr, SIZE*n_times, RUNS);
+        ticks = measure_min_ticks(arr, SIZE, RUNS);
         outfile << n_times << ',' << ticks << std::endl;
         delete[] arr;
     }
 
     
     outfile.close();
-    cout << "\nresults saved in access_ticks.csv\n";
+    cout << "results saved in access_ticks.csv\n";
     
     return 0;
 }
