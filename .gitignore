@@ -1,0 +1,11 @@
+*.exe
+*.o
+*.csv
+*.vscode
+*.dist
+*.png
+
+cblas.h
+libopenblas.a
+libopenblas.dll
+openblas_config.h
