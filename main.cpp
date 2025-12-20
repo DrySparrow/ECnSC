@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <iostream>
 #include <vector>
-#include <cstdint>
 #include <xmmintrin.h>
 #include <limits>
 #include "cblas.h"
@@ -10,10 +10,10 @@
 const int SIZE = 1024; 
 const int M_ITER = 10;
 
-uint64_t getCpuTicks() {
-    unsigned int lo, hi;
-    __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
-    return (static_cast<unsigned long long>(hi) << 32) | lo;
+double get_time_seconds() {
+    auto now = std::chrono::high_resolution_clock::now();
+    auto duration = now.time_since_epoch();
+    return std::chrono::duration<double>(duration).count();
 }
 
 // Вспомогательная функция для вычисления норм и матрицы B = A^T / (||A||1 * ||A||inf)
@@ -74,7 +74,7 @@ void inverse_sse(const float* A, float* A_inv, int N, int M) {
     std::vector<float> B(N * N), R(N * N), temp(N * N), cur_pow(N * N);
     prepare_B(A, B.data(), N);
 
-    // R = I - B*A
+    // R = I - B*
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; j += 4) {
             __m128 sum_v = _mm_setzero_ps();
@@ -137,37 +137,37 @@ int main() {
         }
     }
 
-    uint64_t start, end, minTicks;
+    double start, end, minTime;
 
     // Scalar
-    minTicks = std::numeric_limits<uint64_t>::max();
+    minTime = std::numeric_limits<double>::max();
     for (int i = 0; i < RUNS; ++i) {
-        start = getCpuTicks();
+        start = get_time_seconds();
         inverse_scalar(A.data(), res.data(), SIZE, M_ITER);
-        end = getCpuTicks();
-        minTicks = std::min(minTicks, end - start);
+        end = get_time_seconds();
+        minTime = std::min(minTime, end - start);
     }
-    std::cout << "Scalar ticks: " << minTicks << std::endl;
+    std::cout << "Scalar seconds: " << minTime << std::endl;
 
     // SSE
-    minTicks = std::numeric_limits<uint64_t>::max();
+    minTime = std::numeric_limits<double>::max();
     for (int i = 0; i < RUNS; ++i) {
-        start = getCpuTicks();
+        start = get_time_seconds();
         inverse_sse(A.data(), res.data(), SIZE, M_ITER);
-        end = getCpuTicks();
-        minTicks = std::min(minTicks, end - start);
+        end = get_time_seconds();
+        minTime = std::min(minTime, end - start);
     }
-    std::cout << "SSE ticks:    " << minTicks << std::endl;
+    std::cout << "SSE seconds:    " << minTime << std::endl;
 
     // BLAS
-    minTicks = std::numeric_limits<uint64_t>::max();
+    minTime = std::numeric_limits<double>::max();
     for (int i = 0; i < RUNS; ++i) {
-        start = getCpuTicks();
+        start = get_time_seconds();
         inverse_blas(A.data(), res.data(), SIZE, M_ITER);
-        end = getCpuTicks();
-        minTicks = std::min(minTicks, end - start);
+        end = get_time_seconds();
+        minTime = std::min(minTime, end - start);
     }
-    std::cout << "BLAS ticks:   " << minTicks << std::endl;
+    std::cout << "BLAS seconds:   " << minTime << std::endl;
 
     return 0;
 }
