@@ -1,1 +1,1 @@
-g++ -O0 main.cpp libopenblas.dll -o main.exe -msse && main.exe
+g++ -O3 main.cpp libopenblas.dll -o main.exe -msse && main.exe
